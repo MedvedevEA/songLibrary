@@ -25,5 +25,6 @@ go.work.sum
 .env
 
 # my list
-/log/*.txt
+/log/*
+!/log/readme.md
 /configs/songLibrary.env
