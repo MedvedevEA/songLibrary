@@ -12,17 +12,13 @@ type Logger struct {
 	file *os.File
 }
 
-func New(logLevel string, logFileName string) (*Logger, error) {
+func New(logLevel string, output ...io.Writer) (*Logger, error) {
 	log := logrus.New()
 	logrusLevel, err := logrus.ParseLevel(logLevel)
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.Create(logFileName)
-	if err != nil {
-		return nil, err
-	}
-	logrusOutput := io.MultiWriter(os.Stdout, file)
+	logrusOutput := io.MultiWriter(output...)
 	log.SetOutput(logrusOutput)
 	log.SetLevel(logrusLevel)
 	log.SetFormatter(&logrus.JSONFormatter{})
@@ -32,18 +28,16 @@ func New(logLevel string, logFileName string) (*Logger, error) {
 	}
 	return logger, nil
 }
-func (l *Logger) Debug(message string) {
-	l.log.Debug(message)
+func (l *Logger) Debugf(message string, arg ...interface{}) {
+	l.log.Debugf(message, arg...)
 }
-func (l *Logger) Debugf(message string, arg []interface{}) {
-	l.log.Debugf(message, arg)
+func (l *Logger) Infof(message string, arg ...interface{}) {
+	l.log.Infof(message, arg...)
 }
-func (l *Logger) Info(message string) {
-	l.log.Info(message)
+func (l *Logger) Errorf(message string, arg ...interface{}) {
+	l.log.Errorf(message, arg...)
 }
-func (l *Logger) Infof(message string, arg []interface{}) {
-	l.log.Infof(message, arg)
-}
+
 func (l *Logger) Close() {
 	l.file.Close()
 }

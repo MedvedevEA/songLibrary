@@ -5,10 +5,9 @@ type Store interface {
 type OutsizeApi interface {
 }
 type Logger interface {
-	Debug(string)
-	Debugf(string, []interface{})
-	Info(string)
-	Infof(string, []interface{})
+	Debugf(string, ...interface{})
+	Infof(string, ...interface{})
+	Errorf(string, ...interface{})
 }
 
 type Sevice struct {

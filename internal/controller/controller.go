@@ -7,17 +7,16 @@ import (
 type Service interface {
 }
 type Logger interface {
-	Debug(string)
-	Debugf(string, []interface{})
-	Info(string)
-	Infof(string, []interface{})
+	Debugf(string, ...interface{})
+	Infof(string, ...interface{})
+	Errorf(string, ...interface{})
 }
 type Controller struct {
 	Service Service
 	Logger  Logger
 }
 
-func Init(service Service, router *gin.Engine, logger Logger) {
+func Init(router *gin.Engine, service Service, logger Logger) {
 	controller := &Controller{
 		Service: service,
 		Logger:  logger,
@@ -25,6 +24,6 @@ func Init(service Service, router *gin.Engine, logger Logger) {
 	router.GET("test", controller.Test)
 }
 func (c *Controller) Test(ctx *gin.Context) {
-	c.Logger.Debug("Test route")
+	c.Logger.Debugf("Test route", nil)
 	ctx.Status(200)
 }
