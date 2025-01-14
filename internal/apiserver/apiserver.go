@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"songLibrary/internal/apiserver/middlewares"
 	"songLibrary/internal/controller"
+	"songLibrary/internal/logger"
 	"syscall"
 	"time"
 
@@ -16,8 +18,10 @@ type ApiServer struct {
 	server *http.Server
 }
 
-func New(bindAddress string, service controller.Service, logger controller.Logger) *ApiServer {
+func New(bindAddress string, service controller.Service, logger logger.Logger) *ApiServer {
 	router := gin.New()
+	router.Use(gin.Recovery())
+	router.Use(middlewares.LoggingMiddleware(logger))
 	controller.Init(router, service, logger)
 
 	server := &http.Server{

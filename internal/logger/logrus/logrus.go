@@ -1,4 +1,4 @@
-package logger
+package logrus
 
 import (
 	"io"
@@ -21,7 +21,7 @@ func New(logLevel string, output ...io.Writer) (*Logger, error) {
 	logrusOutput := io.MultiWriter(output...)
 	log.SetOutput(logrusOutput)
 	log.SetLevel(logrusLevel)
-	log.SetFormatter(&logrus.JSONFormatter{})
+	log.SetFormatter(&logrus.TextFormatter{})
 
 	logger := &Logger{
 		log: log,

@@ -1,15 +1,19 @@
 package main
 
 import (
+	"embed"
 	"log"
 	"os"
 	"songLibrary/internal/apiserver"
 	"songLibrary/internal/config"
-	"songLibrary/internal/infrastructure/logger"
 	"songLibrary/internal/infrastructure/outsideapi"
 	"songLibrary/internal/infrastructure/postgresql"
+	"songLibrary/internal/logger/logrus"
 	"songLibrary/internal/service"
 )
+
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
 
 func main() {
 	//config
@@ -18,21 +22,21 @@ func main() {
 		log.Fatal(err)
 	}
 	//logger
-	file, err := os.Create(config.LogFileName)
+	file, err := os.OpenFile(config.LogFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	logger, err := logger.New(config.LogLevel, os.Stdout, file)
+	logger, err := logrus.New(config.LogLevel, os.Stdout, file)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer logger.Close()
 	//store
-	store, err := postgresql.New(config.DatabaseConnectString, logger)
+	store, err := postgresql.New(config.DatabaseConnectString, logger, embedMigrations)
 	if err != nil {
 		log.Fatal(err)
 	}
-	store.Close()
+	defer store.Close()
 	//outsideApi
 	outsideApi := outsideapi.New(config.OutsideServerBindAddress, logger)
 	//service
