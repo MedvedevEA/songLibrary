@@ -29,7 +29,7 @@ type GetSongs struct {
 }
 
 type UpdateSong struct {
-	SongId         *uuid.UUID  `json:"song_id" binding:"required"`
+	SongId         string      `uri:"song_id" binding:"required,uuid4_rfc4122"`
 	GroupId        *uuid.UUID  `json:"group_id"`
 	Name           *string     `json:"name"`
 	ReleaseDate    *types.Date `json:"release_date"`

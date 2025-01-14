@@ -41,14 +41,14 @@ func Init(router *gin.Engine, service Service, logger logger.Logger) {
 	router.POST("groups", controller.addGroup)
 	router.GET("groups/:group_id", controller.getGroup)
 	router.GET("groups", controller.getGroups)
-	router.PUT("groups", controller.updateGroup)
+	router.PUT("groups/:group_id", controller.updateGroup)
 	router.DELETE("groups/:group_id", controller.removeGroup)
 
 	router.POST("songs", controller.addSong)
 	router.GET("songs/:song_id", controller.getSong)
 	router.GET("songs", controller.getSongs)
 	router.GET("songs/:song_id/text", controller.getSongText)
-	router.PUT("songs", controller.updateSong)
+	router.PUT("songs/:song_id", controller.updateSong)
 	router.DELETE("songs/:song_id", controller.removeSong)
 
 }
@@ -120,13 +120,24 @@ func (c *Controller) getGroups(ctx *gin.Context) {
 
 func (c *Controller) updateGroup(ctx *gin.Context) {
 	req := new(controllerDto.UpdateGroup)
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		c.logger.Errorf("controller: %s: %s", "UpdateGroup", err)
+		ctx.Status(400)
+		return
+	}
+	groupId, err := uuid.Parse(req.GroupId)
+	if err != nil {
+		c.logger.Errorf("controller: %s: %s", "UpdateGroup", err)
+		ctx.Status(400)
+		return
+	}
 	if err := ctx.ShouldBindJSON(req); err != nil {
 		c.logger.Errorf("controller: %s: %s", "UpdateGroup", err)
 		ctx.Status(400)
 		return
 	}
-	err := c.service.UpdateGroup(&storeDto.UpdateGroup{
-		GroupId: req.GroupId,
+	err = c.service.UpdateGroup(&storeDto.UpdateGroup{
+		GroupId: &groupId,
 		Name:    req.Name,
 	})
 	if errors.Is(err, servererrors.ErrorRecordNotFound) {
@@ -268,13 +279,24 @@ func (c *Controller) getSongs(ctx *gin.Context) {
 
 func (c *Controller) updateSong(ctx *gin.Context) {
 	req := new(controllerDto.UpdateSong)
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		c.logger.Errorf("controller: %s: %s", "UpdateSong", err)
+		ctx.Status(400)
+		return
+	}
+	songId, err := uuid.Parse(req.SongId)
+	if err != nil {
+		c.logger.Errorf("controller: %s: %s", "UpdateSong", err)
+		ctx.Status(400)
+		return
+	}
 	if err := ctx.ShouldBindJSON(req); err != nil {
 		c.logger.Errorf("controller: %s: %s", "UpdateSong", err)
 		ctx.Status(400)
 		return
 	}
-	err := c.service.UpdateSong(&storeDto.UpdateSong{
-		SongId:         req.SongId,
+	err = c.service.UpdateSong(&storeDto.UpdateSong{
+		SongId:         &songId,
 		GroupId:        req.GroupId,
 		Name:           req.Name,
 		ReleaseDate:    req.ReleaseDate,
