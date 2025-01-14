@@ -3,11 +3,12 @@ package postgresql
 import (
 	"database/sql"
 	"embed"
+	"encoding/json"
 	"errors"
+	"fmt"
 
 	"songLibrary/internal/logger"
 	"songLibrary/internal/model"
-	"songLibrary/internal/pkg/helpers"
 	"songLibrary/internal/pkg/servererrors"
 	"songLibrary/internal/repository/store/dto"
 
@@ -40,12 +41,27 @@ func New(databaseConnectString string, logger logger.Logger, embedMigrations emb
 		logger: logger,
 	}, nil
 }
+func JsonRequest[Req any, Res any](p *Postgresql, funcName string, req *Req) (*Res, error) {
+	j, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	query := fmt.Sprintf("Select * FROM public.%s($1)", funcName)
+	p.logger.Debugf("| SQL query | %s | %s |", query, string(j))
+	row := p.db.QueryRow(query, j)
+	if err := row.Scan(&j); err != nil {
+		return nil, err
+	}
+	res := new(Res)
+	err = json.Unmarshal(j, res)
+	return res, err
+}
 func (p *Postgresql) Close() error {
 	return p.db.Close()
 }
 
 func (p *Postgresql) AddGroup(req *dto.AddGroup) (*model.Group, error) {
-	res, err := helpers.StoreJsonRequest[dto.AddGroup, model.Group](p.db, p.logger, "add_group", req)
+	res, err := JsonRequest[dto.AddGroup, model.Group](p, "add_group", req)
 	if err != nil {
 		p.logger.Errorf("store: %s: %s", "AddGroup", err)
 		return nil, servererrors.ErrorInternal
@@ -53,7 +69,7 @@ func (p *Postgresql) AddGroup(req *dto.AddGroup) (*model.Group, error) {
 	return res, nil
 }
 func (p *Postgresql) GetGroup(req *dto.GetGroup) (*model.Group, error) {
-	res, err := helpers.StoreJsonRequest[dto.GetGroup, model.Group](p.db, p.logger, "get_group", req)
+	res, err := JsonRequest[dto.GetGroup, model.Group](p, "get_group", req)
 	if err != nil {
 		p.logger.Errorf("store: %s: %s", "GetGroup", err)
 		return nil, servererrors.ErrorInternal
@@ -62,7 +78,7 @@ func (p *Postgresql) GetGroup(req *dto.GetGroup) (*model.Group, error) {
 
 }
 func (p *Postgresql) GetGroups(req *dto.GetGroups) (*model.Pagination[model.Group], error) {
-	res, err := helpers.StoreJsonRequest[dto.GetGroups, model.Pagination[model.Group]](p.db, p.logger, "get_groups", req)
+	res, err := JsonRequest[dto.GetGroups, model.Pagination[model.Group]](p, "get_groups", req)
 	if err != nil {
 		p.logger.Errorf("store: %s: %s", "GetGroups", err)
 		return nil, servererrors.ErrorInternal
@@ -70,7 +86,7 @@ func (p *Postgresql) GetGroups(req *dto.GetGroups) (*model.Pagination[model.Grou
 	return res, nil
 }
 func (p *Postgresql) UpdateGroup(req *dto.UpdateGroup) error {
-	_, err := helpers.StoreJsonRequest[dto.UpdateGroup, model.Group](p.db, p.logger, "update_group", req)
+	_, err := JsonRequest[dto.UpdateGroup, model.Group](p, "update_group", req)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return servererrors.ErrorRecordNotFound
@@ -81,7 +97,7 @@ func (p *Postgresql) UpdateGroup(req *dto.UpdateGroup) error {
 	return nil
 }
 func (p *Postgresql) RemoveGroup(req *dto.RemoveGroup) error {
-	_, err := helpers.StoreJsonRequest[dto.RemoveGroup, model.Group](p.db, p.logger, "remove_group", req)
+	_, err := JsonRequest[dto.RemoveGroup, model.Group](p, "remove_group", req)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return servererrors.ErrorRecordNotFound
@@ -92,7 +108,7 @@ func (p *Postgresql) RemoveGroup(req *dto.RemoveGroup) error {
 	return nil
 }
 func (p *Postgresql) AddSong(req *dto.AddSong) (*model.Song, error) {
-	res, err := helpers.StoreJsonRequest[dto.AddSong, model.Song](p.db, p.logger, "add_song", req)
+	res, err := JsonRequest[dto.AddSong, model.Song](p, "add_song", req)
 	if err != nil {
 		p.logger.Errorf("store: %s: %s", "AddSong", err)
 		return nil, servererrors.ErrorInternal
@@ -100,7 +116,7 @@ func (p *Postgresql) AddSong(req *dto.AddSong) (*model.Song, error) {
 	return res, nil
 }
 func (p *Postgresql) GetSong(req *dto.GetSong) (*model.Song, error) {
-	res, err := helpers.StoreJsonRequest[dto.GetSong, model.Song](p.db, p.logger, "get_song", req)
+	res, err := JsonRequest[dto.GetSong, model.Song](p, "get_song", req)
 	if err != nil {
 		p.logger.Errorf("store: %s: %s", "GetSong", err)
 		return nil, servererrors.ErrorInternal
@@ -108,7 +124,7 @@ func (p *Postgresql) GetSong(req *dto.GetSong) (*model.Song, error) {
 	return res, nil
 }
 func (p *Postgresql) GetSongText(req *dto.GetSongText) (*model.Pagination[model.Verse], error) {
-	res, err := helpers.StoreJsonRequest[dto.GetSongText, model.Pagination[model.Verse]](p.db, p.logger, "get_song_text", req)
+	res, err := JsonRequest[dto.GetSongText, model.Pagination[model.Verse]](p, "get_song_text", req)
 	if err != nil {
 		p.logger.Errorf("store: %s: %s", "GetSongText", err)
 		return nil, servererrors.ErrorInternal
@@ -116,7 +132,7 @@ func (p *Postgresql) GetSongText(req *dto.GetSongText) (*model.Pagination[model.
 	return res, nil
 }
 func (p *Postgresql) GetSongs(req *dto.GetSongs) (*model.Pagination[model.Song], error) {
-	res, err := helpers.StoreJsonRequest[dto.GetSongs, model.Pagination[model.Song]](p.db, p.logger, "get_songs", req)
+	res, err := JsonRequest[dto.GetSongs, model.Pagination[model.Song]](p, "get_songs", req)
 	if err != nil {
 		p.logger.Errorf("store: %s: %s", "GetSongs", err)
 		return nil, servererrors.ErrorInternal
@@ -124,7 +140,7 @@ func (p *Postgresql) GetSongs(req *dto.GetSongs) (*model.Pagination[model.Song],
 	return res, nil
 }
 func (p *Postgresql) UpdateSong(req *dto.UpdateSong) error {
-	_, err := helpers.StoreJsonRequest[dto.UpdateSong, model.Song](p.db, p.logger, "update_song", req)
+	_, err := JsonRequest[dto.UpdateSong, model.Song](p, "update_song", req)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return servererrors.ErrorRecordNotFound
@@ -135,7 +151,7 @@ func (p *Postgresql) UpdateSong(req *dto.UpdateSong) error {
 	return nil
 }
 func (p *Postgresql) RemoveSong(req *dto.RemoveSong) error {
-	_, err := helpers.StoreJsonRequest[dto.RemoveSong, model.Song](p.db, p.logger, "remove_song", req)
+	_, err := JsonRequest[dto.RemoveSong, model.Song](p, "remove_song", req)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return servererrors.ErrorRecordNotFound
