@@ -71,6 +71,9 @@ func (p *Postgresql) AddGroup(req *dto.AddGroup) (*model.Group, error) {
 func (p *Postgresql) GetGroup(req *dto.GetGroup) (*model.Group, error) {
 	res, err := JsonRequest[dto.GetGroup, model.Group](p, "get_group", req)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, servererrors.ErrorRecordNotFound
+		}
 		p.logger.Errorf("store: %s: %s", "GetGroup", err)
 		return nil, servererrors.ErrorInternal
 	}
@@ -118,6 +121,9 @@ func (p *Postgresql) AddSong(req *dto.AddSong) (*model.Song, error) {
 func (p *Postgresql) GetSong(req *dto.GetSong) (*model.Song, error) {
 	res, err := JsonRequest[dto.GetSong, model.Song](p, "get_song", req)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, servererrors.ErrorRecordNotFound
+		}
 		p.logger.Errorf("store: %s: %s", "GetSong", err)
 		return nil, servererrors.ErrorInternal
 	}
@@ -126,6 +132,9 @@ func (p *Postgresql) GetSong(req *dto.GetSong) (*model.Song, error) {
 func (p *Postgresql) GetSongText(req *dto.GetSongText) (*model.Pagination[model.Verse], error) {
 	res, err := JsonRequest[dto.GetSongText, model.Pagination[model.Verse]](p, "get_song_text", req)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, servererrors.ErrorRecordNotFound
+		}
 		p.logger.Errorf("store: %s: %s", "GetSongText", err)
 		return nil, servererrors.ErrorInternal
 	}

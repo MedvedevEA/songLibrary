@@ -3,10 +3,13 @@ package service
 import (
 	"songLibrary/internal/logger"
 	"songLibrary/internal/model"
+	"songLibrary/internal/pkg/servererrors"
+	"songLibrary/internal/pkg/types"
 	outsideApiRepo "songLibrary/internal/repository/outsideapi"
 	outsideApiDto "songLibrary/internal/repository/outsideapi/dto"
 	storeRepo "songLibrary/internal/repository/store"
 	storeDto "songLibrary/internal/repository/store/dto"
+	"time"
 )
 
 type Service struct {
@@ -56,10 +59,17 @@ func (s *Service) AddSong(req *storeDto.AddSong) (*model.Song, error) {
 	})
 	if err == nil {
 		s.logger.Debugf("service: AddSong: response received, creating a new record with outside API server data")
+		date, err := time.Parse("02.01.2006", outsideApiRes.ReleaseDate)
+		if err != nil {
+			s.logger.Errorf("service: AddSong: %s", err)
+			return nil, servererrors.ErrorInternal
+		}
+		typesDate := types.Date(date)
+
 		return s.store.AddSong(&storeDto.AddSong{
 			Group:       req.Group,
 			Name:        req.Name,
-			ReleaseDate: outsideApiRes.ReleaseDate,
+			ReleaseDate: &typesDate,
 			Text:        &outsideApiRes.Text,
 			Link:        &outsideApiRes.Link,
 		})

@@ -31,6 +31,7 @@ func (o *OutsideApi) GetInfo(req *dto.GetInfoReq) (*dto.GetInfoRes, error) {
 	params.Add("group", req.Group)
 	params.Add("song", req.Song)
 	reqUrl.RawQuery = params.Encode()
+	o.logger.Debugf("| outside HTTP request | %s | GET |", reqUrl.String())
 	resHttp, err := http.Get(reqUrl.String())
 	if err != nil {
 		o.logger.Errorf("outsideApi: GetInfo: %s", err)
