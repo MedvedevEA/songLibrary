@@ -36,8 +36,6 @@ func Init(router *gin.Engine, service Service, logger logger.Logger) {
 		service: service,
 		logger:  logger,
 	}
-	router.GET("info", controller.getInfo)
-
 	router.POST("groups", controller.addGroup)
 	router.GET("groups/:group_id", controller.getGroup)
 	router.GET("groups", controller.getGroups)
@@ -52,10 +50,6 @@ func Init(router *gin.Engine, service Service, logger logger.Logger) {
 	router.DELETE("songs/:song_id", controller.removeSong)
 
 }
-func (c *Controller) getInfo(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{"releaseDate": "1990-01-01", "text": "Song text", "link": "https://link.com"})
-}
-
 func (c *Controller) addGroup(ctx *gin.Context) {
 	req := new(controllerDto.AddGroup)
 	if err := ctx.ShouldBindJSON(req); err != nil {
