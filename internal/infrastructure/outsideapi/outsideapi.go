@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"songLibrary/internal/logger"
-	"songLibrary/internal/model"
 	"songLibrary/internal/pkg/servererrors"
 	"songLibrary/internal/repository/outsideapi/dto"
 )
@@ -22,7 +21,7 @@ func New(bindAddress string, logger logger.Logger) *OutsideApi {
 		logger:      logger,
 	}
 }
-func (o *OutsideApi) GetInfo(req *dto.GetInfo) (*model.Song, error) {
+func (o *OutsideApi) GetInfo(req *dto.GetInfoReq) (*dto.GetInfoRes, error) {
 	reqUrl, err := url.Parse(o.bindAddress + "/info")
 	if err != nil {
 		o.logger.Errorf("outsideApi: GetInfo: %s", err)
@@ -48,7 +47,7 @@ func (o *OutsideApi) GetInfo(req *dto.GetInfo) (*model.Song, error) {
 		o.logger.Errorf("outsideApi: GetInfo: %s", err)
 		return nil, servererrors.ErrorInternal
 	}
-	res := model.Song{}
+	res := dto.GetInfoRes{}
 	err = json.Unmarshal(body, &res)
 	if err != nil {
 		o.logger.Errorf("outsideApi: GetInfo: %s", err)

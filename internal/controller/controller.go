@@ -53,7 +53,7 @@ func Init(router *gin.Engine, service Service, logger logger.Logger) {
 
 }
 func (c *Controller) getInfo(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{"release_date": "1990-01-01", "text": "Song text", "Link": "https://link.com"})
+	ctx.JSON(200, gin.H{"releaseDate": "1990-01-01", "text": "Song text", "link": "https://link.com"})
 }
 
 func (c *Controller) addGroup(ctx *gin.Context) {

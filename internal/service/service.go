@@ -50,7 +50,7 @@ func (s *Service) RemoveGroup(req *storeDto.RemoveGroup) error {
 func (s *Service) AddSong(req *storeDto.AddSong) (*model.Song, error) {
 
 	//Запрос на внешний api сервер
-	outsideApiRes, err := s.outsideApi.GetInfo(&outsideApiDto.GetInfo{
+	outsideApiRes, err := s.outsideApi.GetInfo(&outsideApiDto.GetInfoReq{
 		Group: req.Group,
 		Song:  req.Name,
 	})
@@ -60,8 +60,8 @@ func (s *Service) AddSong(req *storeDto.AddSong) (*model.Song, error) {
 			Group:       req.Group,
 			Name:        req.Name,
 			ReleaseDate: outsideApiRes.ReleaseDate,
-			Text:        outsideApiRes.Text,
-			Link:        outsideApiRes.Link,
+			Text:        &outsideApiRes.Text,
+			Link:        &outsideApiRes.Link,
 		})
 
 	}
