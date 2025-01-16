@@ -31,8 +31,8 @@ paths:
                   type: string
                   example: "Пикник"
       responses:
-        '200':
-          description: Ok
+        '201':
+          description: Created 
           content:
             application/json:
               schema:
@@ -260,8 +260,8 @@ paths:
             type: string
             example: "youtu.be"
       responses:
-        '200':
-          description: Ok
+        '201':
+          description: Created 
           content:
             application/json:
               schema:

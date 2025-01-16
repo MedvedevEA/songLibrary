@@ -64,7 +64,7 @@ func (c *Controller) addGroup(ctx *gin.Context) {
 		ctx.Status(500)
 		return
 	}
-	ctx.JSON(200, res)
+	ctx.JSON(201, res)
 }
 func (c *Controller) getGroup(ctx *gin.Context) {
 	req := new(controllerDto.GetGroup)
@@ -187,7 +187,7 @@ func (c *Controller) addSong(ctx *gin.Context) {
 		ctx.Status(500)
 		return
 	}
-	ctx.JSON(200, res)
+	ctx.JSON(201, res)
 }
 func (c *Controller) getSong(ctx *gin.Context) {
 	req := new(controllerDto.GetSong)
