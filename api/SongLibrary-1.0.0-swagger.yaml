@@ -192,8 +192,8 @@ paths:
             type: string
             example: "Там, на самом, на краю Земли"
       responses:
-        '200':
-          description: Ok
+        '201':
+          description: Created 
           content:
             application/json:
               schema:
@@ -260,8 +260,8 @@ paths:
             type: string
             example: "youtu.be"
       responses:
-        '201':
-          description: Created 
+        '200':
+          description: Ok
           content:
             application/json:
               schema:
