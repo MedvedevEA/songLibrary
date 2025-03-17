@@ -174,23 +174,22 @@ paths:
       summary: Add song
       operationId: addSong
       description: Add a new song to the library. The text, link, and release date are provided by an outside server api, otherwise the values are nil. Returns Internal Server Error, if the name of the music group is not found.
-      parameters:
-        - name: group
-          required: true
-          in: query
-          description: Name of the music group
-          schema:
-            default: ""
-            type: string
-            example: "Пикник"        
-        - name: song
-          required: true
-          in: query
-          description: Song name
-          schema:
-            default: ""
-            type: string
-            example: "Там, на самом, на краю Земли"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - group
+                - song
+              properties:
+                group:
+                  type: string
+                  example: "Пикник"
+                song:
+                  type: string
+                  example: "Там, на самом, на краю Земли"
       responses:
         '201':
           description: Created 

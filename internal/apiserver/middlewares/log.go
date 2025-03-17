@@ -18,7 +18,7 @@ func LoggingMiddleware(logger logger.Logger) gin.HandlerFunc {
 		reqUri := ctx.Request.RequestURI
 		statusCode := ctx.Writer.Status()
 		clientIP := ctx.ClientIP()
-		logger.Debugf("| HTTP request | %d | %v | %s | %s | %s |", statusCode, latencyTime, clientIP, reqMethod, reqUri)
+		logger.Infof("| HTTP request | %d | %v | %s | %s | %s |", statusCode, latencyTime, clientIP, reqMethod, reqUri)
 
 		ctx.Next()
 	}
